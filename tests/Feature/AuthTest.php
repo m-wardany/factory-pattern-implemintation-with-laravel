@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
+
+use Firebase\JWT\JWT;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -14,12 +16,19 @@ class AuthTest extends TestCase
      */
     public function test_the_login_returns_the_correct_response($expectedResult, $input): void
     {
-        $response = $this->post('/api/login');
+        $response = $this->post('/api/login', $input);
 
         $response->assertStatus(data_get($expectedResult, 'status_code'));
         $response->assertJsonPath('status', data_get($expectedResult, 'status'));
         if ($response->getStatusCode() == 200) {
             $response->assertJsonStructure(['status', 'token']);
+            $token = $response->json('token');
+            $jwt = JWT::decode($token, (new \Firebase\JWT\Key(config('jwt.key'), config('jwt.algorithm'))));
+
+            $this->assertEquals([
+                'login' => data_get($input, 'login'),
+                'context' => data_get($input, 'context'),
+            ], (array) $jwt);
         }
     }
 
@@ -55,6 +64,7 @@ class AuthTest extends TestCase
                 [
                     'login' => 'BAR_123',
                     'password' => 'foo-bar-baz',
+                    'context' => 'BAR',
                 ],
             ],
             'Invalid Baz Login' => [
@@ -75,6 +85,7 @@ class AuthTest extends TestCase
                 [
                     'login' => 'BAZ_123',
                     'password' => 'foo-bar-baz',
+                    'context' => 'BAZ',
                 ],
             ],
             'Invalid FOO Login' => [
@@ -95,6 +106,7 @@ class AuthTest extends TestCase
                 [
                     'login' => 'FOO_123',
                     'password' => 'foo-bar-baz',
+                    'context' => 'FOO',
                 ],
             ],
         ];
