@@ -3,11 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\Suppliers\SupplierLoginService;
-use App\Services\Suppliers\Suppliers\Baz\SupplierLogin;
-use External\Bar\Auth\LoginService;
-use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AuthController extends Controller
