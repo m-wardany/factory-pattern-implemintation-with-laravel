@@ -31,4 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'moviesSuppliers' => [
+        'sleep' => env('MOVIES_SUPPLIERS_SLEEP', 0),
+        'retries' => env('MOVIES_SUPPLIERS_RETRIES', 3),
+    ]
 ];
