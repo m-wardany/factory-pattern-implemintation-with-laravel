@@ -21,15 +21,24 @@ class AuthTest extends TestCase
         $response->assertStatus(data_get($expectedResult, 'status_code'));
         $response->assertJsonPath('status', data_get($expectedResult, 'status'));
         if ($response->getStatusCode() == 200) {
-            $response->assertJsonStructure(['status', 'token']);
-            $token = $response->json('token');
-            $jwt = JWT::decode($token, (new \Firebase\JWT\Key(config('jwt.key'), config('jwt.algorithm'))));
 
-            $this->assertEquals([
-                'login' => data_get($input, 'login'),
-                'context' => data_get($input, 'context'),
-            ], (array) $jwt);
         }
+    }
+
+    function test_token_content(): void
+    {
+        $response = $this->post('/api/login', [
+            'login' => 'FOO_123',
+            'password' => 'foo-bar-baz',
+        ]);
+        $response->assertJsonStructure(['status', 'token']);
+        $token = $response->json('token');
+        $jwt = JWT::decode($token, (new \Firebase\JWT\Key(config('jwt.key'), config('jwt.algorithm'))));
+
+        $this->assertEquals([
+            'login' => 'FOO_123',
+            'context' => 'FOO',
+        ], (array) $jwt);
     }
 
 
